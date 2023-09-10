@@ -1,0 +1,42 @@
+type Item  =
+record{ 
+    description: text;
+    is_active: bool;
+    owner: principal;
+    new_owner: opt principal;
+    bids:vec record { principal; nat64 };   
+    };
+
+type CreateItem=
+record{
+    description:text;
+    is_active:bool;
+};
+
+type AuctionError=
+    variant{
+        InvalidBid,
+        ItemIsNotActive;
+        NoSuchItem;
+        AccessRejected;
+        UpdateError;
+    };
+
+type Result = 
+variant{
+    Ok;
+    Err: AuctionError;
+};
+
+
+service:{
+    "get_item": (nat64) ->(opt Item) query;
+    "get_all_items":()-> (opt vec record { nat64; Item })  query;
+    "get_item_sold_for_the_most":() -> (Result) query;
+    "get_item_bid_on_the_most":() -> (opt Item) query;
+    "get_item_count": ()->(nat64) query;    
+    "create_item": (nat64, CreateItem) ->(opt Item);
+    "bid_item": (nat64, nat64)-> (Result);
+    "edit_item": (nat64, text) -> (Result);
+    "stop_item": (nat64) -> (Result);
+};
